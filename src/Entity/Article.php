@@ -2,29 +2,29 @@
 
 namespace App\Entity;
 
+use App\Repository\ArticleRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Repository\ArticleRepository;
-use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
+use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 #[ORM\Entity(repositoryClass: ArticleRepository::class)]
 class Article
 {
+    // Pour utiliser les Traits de Gedmo,
+    // vous devrez faire un 'composer require gedmo/doctrine-extensions'.
+    /*
+     Ces deux 'use' sont des "traits", cela permet de faire comme un 'include'
+     mais pour une Class.
+     Ces instructions ajoutent 3 propriétés à la class Article :
+       - $createdAt
+       - $updatedAt
+       - $deletedAt
 
-    // Pour utiliser les Traits de Gedmo, 
-    //vous devrez faire un 'composer require gedmo/doctrine-extensions'
-    /* 
-    Ces deux 'use' sont des 'traits', cela permet de faire comme un 'include'
-    mais pour une Class.
-    Ces instructions ajoutent 3 propriétés
-        $createdAt
-        $updatedAt
-        $deletedAt
-    */
+    Mais aussi les getters/setters appropriés.
+     */
     use TimestampableEntity;
     use SoftDeleteableEntity;
-
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

@@ -56,6 +56,20 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->add($user, true);
     }
 
+    /*
+     * Cette méthode qui est une requête DQL personnalisée (Doctrine Query Language) nous permet de récupérer
+     * les catégories qui ont été archivés.
+     */
+    public function findAllArchived(string $order = 'ASC')
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.deletedAt IS NOT NULL')
+            ->orderBy('u.deletedAt', $order)
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
 //    /**
 //     * @return User[] Returns an array of User objects
 //     */
