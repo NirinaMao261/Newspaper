@@ -10,47 +10,42 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 
 class AppFixtures extends Fixture
 {
-    private SluggerInterface $slugger;
-    
-    public function load(ObjectManager $manager): void 
+    public function __construct(SluggerInterface $slugger)
     {
-        $this->slugger = $slugger;
-        // $product = new Product();
-        // $manager->persist($product);
+        $this->$slugger = $slugger;
     }
 
-    public function load(ObjectManager $manager): void 
-    
+    public function load(ObjectManager $manager): void
     {
-    $categories =[
-        
-        'Loisirs',
-        'Société',
-        'Jeu vidéo',
-        'Ecologie',
-        'Technologie',
-        'Mode',
-        'Politique',
-        'Sport',
+        $categories = [
+            'Cinema',
+            'Sport',
+            'People',
+            'Politique',
+            'Jeu Video',
+            'Ecologie',
+            'Ecologie',
+            'Mode',
+            'Société'
+        ];
 
-];
+        foreach ($categories as $name) {
 
-foreach($categories as $name) {
+            $category = new Category();
 
-    $category = new Category();
+            $category->setName($name);
+            $category->setAlias($this->Slugger->slug($name));
 
-    $category->setName($name);
-    $category->setAlias($this->slugger->slug($name));
+            $category->setCreatedAt(new DateTime());
+            $category->setUpdatedAt(new DateTime());
 
-    $category->setCreatedAt(new DateTime());
-    $category->setUpdatedAt(new DateTime());
-
-    $manager->persist($category);
-}
-
+            # La méthode persist() exécute
+            $manager->persist($category);
+        }
         # La méthode flush() n'est pas dans la boucle foreach() pour une raison :
         # => cette méthode "vide" l'objet $manager qui est un 'container'.
         # Avant de se 'vider', le $manager exécute les insertions en BDD, pour de vrai cette fois ci !
+
         $manager->flush();
     }
 }

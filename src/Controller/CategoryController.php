@@ -26,7 +26,7 @@ class CategoryController extends AbstractController
             $category->setCreatedAt(new DateTime());
             $category->setUpdatedAt(new DateTime());
 
-            $category->setAlias($slugger->slug($Category->getName()));
+            $category->setAlias($slugger->slug($category->getName()));
 
             $repository->add($category, true);
 
@@ -34,8 +34,45 @@ class CategoryController extends AbstractController
             return $this->redirectToRoute('show_dashboard');
         }
         return $this->render('admin/form/category.html.twig', [
-'form' => $form->createView(),
+            'category' => $category,
+            'form' => $form->createView(),
         ]);
 
+    } // end function update
+
+    #[Route('/archive-une-categorie/{id)', name: 'soft_delete_category', methods:['GET'])]
+    public function softDelete(Category $category, CategoryRepository $repository): Response
+    {
+            $category->setDeletedAt(new DateTime());
+
+            $repository->add($category, true);
+
+            $this->addFlash('success', 'La catégorie a bien été archové. Voir les archoves pour restaure');
+            return $this->redirectToroute('show_dashboard');
+    } // end function sofetDelete ()
+
+    #[Route('/restaure-une-categorie/{id}', name: 'restore_category', methods: ['GET'])]
+    public function restore(Category $category, CategoryRepository $repository): Response
+    {
+
+        $category->setDeleteAt(null);
+
+        $repository->add($category, true);
+
+        $this->addFlash('success', 'La catégorie a bien été restauré!');
+        return $this->redirectToRoute('show_dashboard');
     }
+    #[Route('/supprimer-une-categorie/{id}', name: 'hard_delete_category', methods: ['GET'])]
+    public function restore(Category $category, CategoryRepository $repository): Response    
+    {
+        $category->setDeleteAt(null);
+
+        $this->addFlash('success', 'La catégorie a été definitivement supprimée du systême!');
+        return $this->redirectToRoute('show_dashboard');
+    }
+
+    }
+
 }
+
+
