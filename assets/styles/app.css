@@ -7,12 +7,19 @@
 
 
 body {
-    background-color: #FFFFF !important;
+    background-color: #FFFFFF !important;
 }
 
 
 item-hover:hover{
     color: #ffc107 !important;
     text-decoration-style: solid;
+
+}
+
+img-custome {
+    object-fit: cover;
+    width: 375px;
+    height: 210px;
 
 }
