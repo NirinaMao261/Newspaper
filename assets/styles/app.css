@@ -1,3 +1,18 @@
+*, ::before, ::after { 
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+}
+
+
 body {
-    background-color: lightgray;
+    background-color: #FFFFF !important;
+}
+
+
+item-hover:hover{
+    color: #ffc107 !important;
+    text-decoration-style: solid;
+
 }
