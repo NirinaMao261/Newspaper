@@ -2,20 +2,21 @@
 
 namespace App\Controller;
 
+use DateTime;
+use App\Entity\User;
 use App\Entity\Article;
 use App\Entity\Category;
-use App\Entity\User;
 use App\Form\ArticleFormType;
 use App\Repository\ArticleRepository;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 #[Route('/admin')]
 class AdminController extends AbstractController
@@ -130,8 +131,46 @@ class AdminController extends AbstractController
             $photo->move($this->getParameter('uploads_dir'), $newFilename);
             $article->setPhoto($newFilename);
         } catch (FileException $exception) {
-            // code à exécuter si erreur.
         }
     }
+    #[Route('/archiver-un-article/{id}', name: 'soft_delete_article', methodes: ['GET'])]
+    public function softDeleteArticle(Article $article, ArticleRepository $repository): RedirectResponse 
+    {
+        $article->setDeletedAt(new DateTime);
 
+        $repository->add($article, true);
+
+        $this->addFlash('success', "L'article a bien été archivé. Voir les archives!");
+        return $this->redirectToRoute('show_dashboard');
+    }
+    #[Route('/restaurer-un-article/{id}', name: 'restaure_article', methodes: ['GET'])]
+    public function restaureArticle(Article $article, ArticleRepository $repository): RedirectResponse 
+    {
+        $article->setDeletedAt(new DateTime);
+
+        $repository->add($article, true);
+
+        $this->addFlash('success', "L'article a bien été restauré!");
+        return $this->redirectToRoute('show_archives');
+    }
+    #[Route('/supprimer-un-article/{id}', name: 'hard_delete_article', methodes: ['GET'])]
+    public function hardDeleteArticle(Article $article, ArticleRepository $repository): RedirectResponse 
+    {
+        $photo = $article->getPhoto();
+
+        if ($photo){
+            // Pour supprimern un fichier dans le systeme, on utilise la fonction native de php unLink().
+            unLink($this->getParameter('uploads_dir') . '/' . $photo);
+        
+    }
+
+
+        $repository->add($article, true);
+
+        $this->addFlash('success', "L'article a bien été supprimé définitivement du systême!");
+        return $this->redirectToRoute('show_archives');
+    }
+                // code à exécuter si erreur.
+
+                
 }// end class
