@@ -10,3 +10,9 @@ import './styles/app.css';
 
 // start the Stimulus application
 import './bootstrap';
+
+ClassicEditor
+    .create( document.querySelector('#article_form_content') )
+    .catch(error=>{
+        console.log(error);
+    });
