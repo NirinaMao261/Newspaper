@@ -2,29 +2,31 @@
 
 namespace App\Entity;
 
+use App\Repository\ArticleRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Repository\ArticleRepository;
-use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
+use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 #[ORM\Entity(repositoryClass: ArticleRepository::class)]
 class Article
 {
+    // Pour utiliser les Traits de Gedmo,
+    // vous devrez faire un 'composer require gedmo/doctrine-extensions'.
+    /*
+     Ces deux 'use' sont des "traits", cela permet de faire comme un 'include'
+     mais pour une Class.
+     Ces instructions ajoutent 3 propriétés à la class Article :
+       - $createdAt
+       - $updatedAt
+       - $deletedAt
 
-    // Pour utiliser les Traits de Gedmo, 
-    //vous devrez faire un 'composer require gedmo/doctrine-extensions'
-    /* 
-    Ces deux 'use' sont des 'traits', cela permet de faire comme un 'include'
-    mais pour une Class.
-    Ces instructions ajoutent 3 propriétés
-        $createdAt
-        $updatedAt
-        $deletedAt
-    */
+    Mais aussi les getters/setters appropriés.
+     */
     use TimestampableEntity;
     use SoftDeleteableEntity;
-
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -53,6 +55,14 @@ class Article
     #[ORM\ManyToOne(inversedBy: 'articles')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Category $category = null;
+
+    #[ORM\OneToMany(mappedBy: 'article', targetEntity: Commentary::class)]
+    private Collection $commentaries;
+
+    public function __construct()
+    {
+        $this->commentaries = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -112,7 +122,7 @@ class Article
         return $this->photo;
     }
 
-    public function setPhoto(string $photo): self
+    public function setPhoto(?string $photo): self
     {
         $this->photo = $photo;
 
@@ -139,6 +149,36 @@ class Article
     public function setCategory(?Category $category): self
     {
         $this->category = $category;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Commentary>
+     */
+    public function getCommentaries(): Collection
+    {
+        return $this->commentaries;
+    }
+
+    public function addCommentary(Commentary $commentary): self
+    {
+        if (!$this->commentaries->contains($commentary)) {
+            $this->commentaries->add($commentary);
+            $commentary->setArticle($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommentary(Commentary $commentary): self
+    {
+        if ($this->commentaries->removeElement($commentary)) {
+            // set the owning side to null (unless already changed)
+            if ($commentary->getArticle() === $this) {
+                $commentary->setArticle(null);
+            }
+        }
 
         return $this;
     }
